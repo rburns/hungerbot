@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "feedparser": "^0.19.2",
-    "slack-client": "^1.2.2"
-  }
+    "slack-client": "^1.2.2",
+    "request": "^2.51.0"
+  },
+  "devDependencies": {}
 }
