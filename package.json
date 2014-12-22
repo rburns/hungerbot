@@ -7,5 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "feedparser": "^0.19.2",
+    "slack-client": "^1.2.2"
+  }
 }
