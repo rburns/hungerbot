@@ -3,6 +3,6 @@ try {
 } catch(err) {
 }
 require("./out/goog/bootstrap/nodejs.js");
-require("./out/caterbot.js");
-goog.require("caterbot.core");
+require("./out/hungerbot.js");
+goog.require("hungerbot.core");
 goog.require("cljs.nodejscli");

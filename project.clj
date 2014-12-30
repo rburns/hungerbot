@@ -13,10 +13,10 @@
   :source-paths ["src"]
 
   :cljsbuild {
-    :builds [{:id "caterbot"
+    :builds [{:id "hungerbot"
               :source-paths ["src"]
               :compiler {
-                :output-to "out/caterbot.js"
+                :output-to "out/hungerbot.js"
                 :output-dir "out"
                 :target :nodejs
                 :optimizations :none
