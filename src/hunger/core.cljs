@@ -1,7 +1,6 @@
 (ns hunger.core
   (:require [cljs.nodejs :as nodejs]
-            [hunger.redis-store :refer [RedisStore store IStore.fetch]]
-            [hunger.store :refer [IStore:fetch]]))
+            [hunger.store :refer [fetch]]))
 
 (defn add-feed
   [url store]

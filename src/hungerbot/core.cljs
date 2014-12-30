@@ -1,7 +1,8 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
             [hunger.core :refer [list-feeds]]
-            [hunger.redis-store :refer [store destroy]]))
+            [hunger.store :refer [destroy]]
+            [hunger.redis-store :refer [store]]))
 
 (nodejs/enable-util-print!)
 
