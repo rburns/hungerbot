@@ -1,23 +1,24 @@
 (ns hunger.core
   (:require [cljs.nodejs :as nodejs]
-            [hunger.store :refer [fetch]]))
+            [hunger.store :refer [fetch write collection-fetch collection-add collection-remove]]))
 
 (defn add-feed
-  [url store]
-  )
+  [url store cb]
+  (collection-add store "feeds" url cb))
 
 (defn remove-feed
-  [id store]
-  )
+  [url store cb]
+  (collection-remove store "feeds" url cb))
 
 (defn list-feeds
   [store cb]
-  (fetch store :feeds cb))
+  (collection-fetch store "feeds" cb))
 
 (defn last-item-in-feed
-  [id store]
-  )
+  [url store cb]
+  (fetch store (str "last-item-of-" url) cb))
 
 (defn update-last-item-in-feed
-  [id item store]
-  )
+  [url item store cb]
+  (write store (str "last-item-of-" url) item cb))
+
