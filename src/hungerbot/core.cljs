@@ -1,16 +1,14 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
-            [hunger.core :refer [list-feeds]]
+            [hungerbot.slack :refer [slack]]
+            [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :refer [store]]))
 
 (nodejs/enable-util-print!)
 
 (defn -main []
-  (let [store (store)]
-    (list-feeds store (fn [error feeds]
-                        (println "callback called")
-                        (println feeds)
-                        (destroy store)))))
+  (let [store (store)
+        slack (slack)]))
 
 (set! *main-cli-fn* -main)
