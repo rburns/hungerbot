@@ -54,7 +54,7 @@
     (let [parsed-message (parse-message message slack)]
       (println (str "message: " parsed-message))
       (when (:should-respond parsed-message)
-        (if-let [handler ((keyword (:command parsed-message)) (:commands engine))]
+        (if-let [handler (:handler ((keyword (:command parsed-message)) (:commands engine)))]
           (handler parsed-message slack)
           ((:default-response engine) parsed-message slack))))))
 
@@ -68,7 +68,7 @@
 (defn slack
   [user-engine]
   (let [slack (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))
-        engine (assoc-in user-engine [:commands :help] do-help)]
+        engine (assoc-in user-engine [:commands :help] {:handler (help-cmd user-engine)})]
     (.on slack "open" (handle-open slack engine))
     (.on slack "message" (handle-message slack engine))
     (.on slack "error" (handle-error slack engine))

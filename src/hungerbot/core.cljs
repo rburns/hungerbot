@@ -7,25 +7,33 @@
 
 (nodejs/enable-util-print!)
 
-(defn join-cmd
-  [message slack]
-  (.send (:channel message) "I'll be able to join channels shortly!"))
+(def join-cmd
+  {:description "Join a channel."
+   :params [:channel]
+   :handler (fn [message slack]
+              (.send (:channel message) "I'll be able to join channels shortly!"))})
 
-(defn leave-cmd
-  [message slack]
-  (.send (:channel message) "I'll be able to leave channels shortly!"))
+(def leave-cmd
+  {:description "Leave the current channel."
+   :handler (fn [message slack]
+              (.send (:channel message) "I'll be able to leave channels shortly!"))})
 
-(defn subscribe-cmd
-  [message slack]
-  (.send (:channel message) "I'll be able to subscribe to feeds shortly!"))
+(def subscribe-cmd
+  {:description "Add a feed to the current channel."
+   :params [:url]
+   :handler (fn [message slack]
+              (.send (:channel message) "I'll be able to subscribe to feeds shortly!"))})
 
-(defn list-cmd
-  [message slack]
-  (.send (:channel message) "I'll be able to list feeds shortly!"))
+(def list-cmd
+  {:description "List the feeds in the current channel."
+   :handler  (fn [message slack]
+               (.send (:channel message) "I'll be able to list feeds shortly!"))})
 
-(defn remove-cmd
-  [message slack]
-  (.send (:channel message) "I'll be able to remove feed subscriptions shortly!"))
+(def remove-cmd
+  {:description "Removes a feed from the current channel."
+   :params [:url]
+   :handler (fn [message slack]
+              (.send (:channel message) "I'll be able to remove feed subscriptions shortly!"))})
 
 (defn default-response
   [message slack]
