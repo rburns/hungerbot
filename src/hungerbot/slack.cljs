@@ -33,73 +33,45 @@
      :should-respond (message-is-for-me text channel slack)}))
 
 (defn handle-open
-  [slack]
+  [slack engine]
   (fn
     []
     (println "I am connected!")))
 
-(defn do-subscribe
-  [message slack]
-  (.send (:channel message) "I'll be able to subscribe to feeds shortly!"))
-
-(defn do-list
-  [message slack]
-  (.send (:channel message) "I'll be able to list feeds shortly!"))
-
-(defn do-remove
-  [message slack]
-  (.send (:channel message) "I'll be able to remove feed subscriptions shortly!"))
-
-(defn do-join
-  [message slack]
-  (.send (:channel message) "I'll be able to join channels shortly!"))
-
-(defn do-leave
-  [message slack]
-  (.send (:channel message) "I'll be able to leave channels shortly!"))
-
 (defn do-help
   [message slack]
-  (.send (:channel message) (str "I'll give you the feeds.\n"
+  (.send (:channel message) (str "`I'll give you the feeds.`\n"
                                  "*join* <channel-name> - _Join a channel._\n"
                                  "*leave* - _Leave the current channel._\n"
                                  "*subscribe* <url> - _Add a feed to the current channel._\n"
                                  "*list* - _List the feeds in the current channel._\n"
                                  "*remove* <url> - _Removes a feed from the current channel._\n")))
 
-(defn do-default
-  [message slack]
-  (.send (:channel message) "I have no idea what you are talking about."))
-
 (defn handle-message
-  [slack]
+  [slack engine]
   (fn
     [message]
     (let [parsed-message (parse-message message slack)]
       (println (str "message: " parsed-message))
       (when (:should-respond parsed-message)
-        (condp = (:command parsed-message)
-          "subscribe" (do-subscribe parsed-message slack)
-          "list" (do-list parsed-message slack)
-          "remove" (do-remove parsed-message slack)
-          "join" (do-join parsed-message slack)
-          "leave" (do-leave parsed-message slack)
-          "help" (do-help parsed-message slack)
-          (do-default parsed-message slack))))))
+        (if-let [handler ((keyword (:command parsed-message)) (:commands engine))]
+          (handler parsed-message slack)
+          ((:default-response engine) parsed-message slack))))))
 
 (defn handle-error
-  [slack]
+  [slack engine]
   (fn
     [error]
     (println "slack error:")
     (.log js/console error)))
 
 (defn slack
-  []
-  (let [slack (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))]
-    (.on slack "open" (handle-open slack))
-    (.on slack "message" (handle-message slack))
-    (.on slack "error" (handle-error slack))
+  [user-engine]
+  (let [slack (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))
+        engine (assoc-in user-engine [:commands :help] do-help)]
+    (.on slack "open" (handle-open slack engine))
+    (.on slack "message" (handle-message slack engine))
+    (.on slack "error" (handle-error slack engine))
     (.login slack)
     slack))
 
