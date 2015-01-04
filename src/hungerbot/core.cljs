@@ -9,17 +9,6 @@
 
 (def config (:config (js->clj (nodejs/require "../config.js") :keywordize-keys true)))
 
-(def join-cmd
-  {:description "Join a channel."
-   :params [:channel]
-   :handler (fn [message slack]
-              (.send (:channel message) "I'll be able to join channels shortly!"))})
-
-(def leave-cmd
-  {:description "Leave the current channel."
-   :handler (fn [message slack]
-              (.send (:channel message) "I'll be able to leave channels shortly!"))})
-
 (def subscribe-cmd
   {:description "Add a feed to the current channel."
    :params [:url]
@@ -45,9 +34,7 @@
   (let [store (store)
         slack (animate {:description "I'll give you the feeds"
                         :config config
-                        :commands {:join join-cmd
-                                   :leave leave-cmd
-                                   :subscribe subscribe-cmd
+                        :commands {:subscribe subscribe-cmd
                                    :list list-cmd
                                    :remove remove-cmd}
                         :default-response default-response})]))
