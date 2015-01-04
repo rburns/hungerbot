@@ -41,7 +41,8 @@
 
 (defn -main []
   (let [store (store)
-        slack (slack {:commands {:join join-cmd
+        slack (slack {:description "I'll give you the feeds"
+                      :commands {:join join-cmd
                                  :leave leave-cmd
                                  :subscribe subscribe-cmd
                                  :list list-cmd
