@@ -1,5 +1,6 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
+            [clojure.string :refer [join]]
             [carcass.core :refer [animate token->url]]
             [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
@@ -26,7 +27,10 @@
 (def list-cmd
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
-               (.send (:channel message) "I'll be able to list feeds shortly!"))})
+               (list-feeds @store (fn [error, result]
+                                   (if (= nil error)
+                                    (.send (:channel message) (join "\n" result))
+                                    (.send (:channel message) "Not sure what to say.")))))})
 
 (def remove-cmd
   {:description "Removes a feed from the current channel."
