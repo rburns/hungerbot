@@ -13,11 +13,21 @@
   :source-paths ["src"]
 
   :cljsbuild {
-    :builds [{:id "hungerbot"
-              :source-paths ["src"]
-              :compiler {
-                :output-to "out/hungerbot.js"
-                :output-dir "out"
-                :target :nodejs
-                :optimizations :none
-                :source-map true}}]})
+              :builds [{:id "hungerbot"
+                        :source-paths ["src"]
+                        :compiler {
+                                   :output-to "out/hungerbot.js"
+                                   :output-dir "out"
+                                   :target :nodejs
+                                   :optimizations :none
+                                   :source-map true}}
+                       {:id "hungerbot-test"
+                        :source-paths ["src" "test"]
+                        :notify-command ["node" "./run_tests.js"]
+                        :compiler {:output-to "test_out/test.js"
+                                   :output-dir "test_out"
+                                   :target :nodejs
+                                   :optimizations :none
+                                   :source-map true}}]
+              :test-commands {"test" ["node" "./run_tests.js"]}})
+
