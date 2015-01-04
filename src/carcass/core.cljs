@@ -14,6 +14,12 @@
   [token]
   (last (re-find user-token-re token)))
 
+(def url-token-re #"^<(http.+)>$")
+
+(defn token->url
+  [url]
+  (last (re-find url-token-re url)))
+
 (defn message-is-for-me
   [text channel slack]
   (cond

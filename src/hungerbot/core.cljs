@@ -1,19 +1,27 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
-            [carcass.core :refer [animate]]
+            [carcass.core :refer [animate token->url]]
             [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
-            [hunger.redis-store :refer [store]]))
+            [hunger.redis-store :as redis-store]))
 
 (nodejs/enable-util-print!)
 
 (def config (:config (js->clj (nodejs/require "../config.js") :keywordize-keys true)))
 
+(def store (atom nil))
+
 (def subscribe-cmd
   {:description "Add a feed to the current channel."
    :params [:url]
    :handler (fn [message slack]
-              (.send (:channel message) "I'll be able to subscribe to feeds shortly!"))})
+              (let [channel (:channel message)]
+                (if-let [url (token->url (-> message :params first))]
+                  (add-feed url @store (fn [error, result]
+                                         (if (= nil error)
+                                           (.send channel "Duly noted, sir.")
+                                           (.send channel "Something went wrong."))))
+                  (.send channel "Hardly seems you should be looking at that."))))})
 
 (def list-cmd
   {:description "List the feeds in the current channel."
@@ -31,12 +39,12 @@
   (.send (:channel message) "I have no idea what you are talking about."))
 
 (defn -main []
-  (let [store (store)
-        slack (animate {:description "I'll give you the feeds"
-                        :config config
-                        :commands {:subscribe subscribe-cmd
-                                   :list list-cmd
-                                   :remove remove-cmd}
-                        :default-response default-response})]))
+  (reset! store (redis-store/store))
+  (animate {:description "I'll give you the feeds"
+            :config config
+            :commands {:subscribe subscribe-cmd
+                       :list list-cmd
+                       :remove remove-cmd}
+            :default-response default-response}))
 
 (set! *main-cli-fn* -main)
