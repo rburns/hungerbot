@@ -1,7 +1,6 @@
-(ns hungerbot.slack
+(ns carcass.core
   (:require [cljs.nodejs :as nodejs]
-            [clojure.string :refer [split join]]
-            [hungerbot.config :refer [config]]))
+            [clojure.string :refer [split join]]))
 
 (def Slack (nodejs/require "slack-client"))
 
@@ -80,8 +79,8 @@
     (println "slack error:")
     (.log js/console error)))
 
-(defn slack
-  [user-engine]
+(defn animate
+  [config user-engine]
   (let [slack (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))
         engine (assoc-in user-engine [:commands :help] {:handler (help-cmd user-engine)})]
     (.on slack "open" (handle-open slack engine))

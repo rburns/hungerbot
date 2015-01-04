@@ -1,6 +1,7 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
-            [hungerbot.slack :refer [slack]]
+            [hungerbot.config :refer [config]]
+            [carcass.core :refer [animate]]
             [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :refer [store]]))
@@ -41,12 +42,12 @@
 
 (defn -main []
   (let [store (store)
-        slack (slack {:description "I'll give you the feeds"
-                      :commands {:join join-cmd
-                                 :leave leave-cmd
-                                 :subscribe subscribe-cmd
-                                 :list list-cmd
-                                 :remove remove-cmd}
-                      :default-response default-response})]))
+        slack (animate config {:description "I'll give you the feeds"
+                             :commands {:join join-cmd
+                                        :leave leave-cmd
+                                        :subscribe subscribe-cmd
+                                        :list list-cmd
+                                        :remove remove-cmd}
+                             :default-response default-response})]))
 
 (set! *main-cli-fn* -main)
