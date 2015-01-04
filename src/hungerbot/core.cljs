@@ -43,11 +43,11 @@
 (defn -main []
   (let [store (store)
         slack (animate config {:description "I'll give you the feeds"
-                             :commands {:join join-cmd
-                                        :leave leave-cmd
-                                        :subscribe subscribe-cmd
-                                        :list list-cmd
-                                        :remove remove-cmd}
-                             :default-response default-response})]))
+                               :commands {:join join-cmd
+                                          :leave leave-cmd
+                                          :subscribe subscribe-cmd
+                                          :list list-cmd
+                                          :remove remove-cmd}
+                               :default-response default-response})]))
 
 (set! *main-cli-fn* -main)
