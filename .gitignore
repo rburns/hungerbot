@@ -12,5 +12,5 @@ pom.xml
 
 /.boot
 /node_modules
-/src/hungerbot/config.cljs
+/config.js
 

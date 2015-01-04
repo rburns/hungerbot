@@ -1,0 +1,11 @@
+exports.config = {
+
+	// The token probided but the slack bot integration
+	"token":          "xxxx-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+
+	// Automatically reconnect upon disconnect
+	"auto-reconnect": true,
+
+	// Automatically mark last read message in channel
+	"auto-mark":      true
+};

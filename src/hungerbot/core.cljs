@@ -1,12 +1,13 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
-            [hungerbot.config :refer [config]]
             [carcass.core :refer [animate]]
             [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :refer [store]]))
 
 (nodejs/enable-util-print!)
+
+(def config (:config (js->clj (nodejs/require "../config.js") :keywordize-keys true)))
 
 (def join-cmd
   {:description "Join a channel."
