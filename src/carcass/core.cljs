@@ -80,8 +80,9 @@
     (.log js/console error)))
 
 (defn animate
-  [config user-engine]
-  (let [slack (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))
+  [user-engine]
+  (let [config (:config user-engine)
+        slack  (Slack. (:token config) (:auto-reconnect config) (:auto-mark config))
         engine (assoc-in user-engine [:commands :help] {:handler (help-cmd user-engine)})]
     (.on slack "open" (handle-open slack engine))
     (.on slack "message" (handle-message slack engine))
