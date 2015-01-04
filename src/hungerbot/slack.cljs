@@ -1,6 +1,6 @@
 (ns hungerbot.slack
   (:require [cljs.nodejs :as nodejs]
-            [clojure.string :refer [split]]
+            [clojure.string :refer [split join]]
             [hungerbot.config :refer [config]]))
 
 (def Slack (nodejs/require "slack-client"))
@@ -38,14 +38,29 @@
     []
     (println "I am connected!")))
 
-(defn do-help
-  [message slack]
-  (.send (:channel message) (str "`I'll give you the feeds.`\n"
-                                 "*join* <channel-name> - _Join a channel._\n"
-                                 "*leave* - _Leave the current channel._\n"
-                                 "*subscribe* <url> - _Add a feed to the current channel._\n"
-                                 "*list* - _List the feeds in the current channel._\n"
-                                 "*remove* <url> - _Removes a feed from the current channel._\n")))
+(defn help-for-command
+  [command info]
+  (let [has-params       (not (= nil (:params info)))
+        has-description  (not (= nil (:description info)))]
+    (join " " (cond-> [(str "*" (name command) "*")]
+                has-params      (conj (join "" (map #(str "<" (name %) ">") (:params info))))
+                has-description (conj (str "- _" (:description info) "_"))))))
+
+(defn help-cmd-content
+  [engine]
+  (let [has-description (not (= nil (:description engine)))
+        has-commands    (> (count (seq (:commands engine))) 0)
+        commands        (map #(help-for-command (first %) (last %)) (seq (:commands engine)))]
+    (join "\n" (cond-> []
+                 has-description (conj (str "`" (:description engine) "`"))
+                 has-commands    (conj (join "\n" commands))))))
+
+(defn help-cmd
+  [engine]
+  (let [content (help-cmd-content engine)]
+    (fn
+      [message slack]
+      (.send (:channel message) content))))
 
 (defn handle-message
   [slack engine]

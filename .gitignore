@@ -3,10 +3,12 @@ pom.xml
 /lib/
 /classes/
 /out/
+/test_out/
 /target/
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
+.lein-failures
 
 /.boot
 /node_modules
