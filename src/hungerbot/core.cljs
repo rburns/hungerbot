@@ -1,7 +1,7 @@
 (ns hungerbot.core
   (:require [cljs.nodejs :as nodejs]
             [clojure.string :refer [join]]
-            [carcass.core :refer [animate token->url]]
+            [carcass.core :as carcass :refer [token->url]]
             [hunger.core :refer [list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :as redis-store]))
@@ -44,11 +44,11 @@
 
 (defn -main []
   (reset! store (redis-store/store))
-  (animate {:description "I'll give you the feeds"
-            :config config
-            :commands {:subscribe subscribe-cmd
-                       :list list-cmd
-                       :remove remove-cmd}
-            :default-response default-response}))
+  (carcass/animate {:description "I'll give you the feeds"
+                    :config config
+                    :commands {:subscribe subscribe-cmd
+                               :list list-cmd
+                               :remove remove-cmd}
+                    :default-response default-response}))
 
 (set! *main-cli-fn* -main)
