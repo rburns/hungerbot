@@ -2,6 +2,10 @@
 
 Hungerbot is a bot for Slack built with the intention of handling github activity feeds in a more elegant fashion than the standard Slackbot feed reader.                                                                          
 
+```
+NOTE: This is yet to be in good working order. Under development.
+```
+
 ### Install
 
 ```bash
