@@ -1,9 +1,13 @@
 (ns hunger.redis-store
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
             [goog.crypt.base64 :as b64]
-            [hunger.store :refer [IStore]]))
+            [cljs.core.async :refer [<!]]
+            [clojure.string :refer [join replace]]
+            [hunger.store :refer [IStore]]
+            [redis.core :refer [redis-connect]]))
 
-(def redis (nodejs/require "redis"))
+(def sep ":")
 
 (defn key->string
   [string]
@@ -13,38 +17,57 @@
   [string]
   (b64/decodeString string))
 
+(defn normalize-key
+  [prefix key]
+  (str prefix sep (if (vector? key) (join sep key) key)))
+
+(defn- wildcard?
+  [id]
+  (and (vector? id) (= "*" (last id))))
+
+(defn- de-prefix
+  [prefix string]
+  (replace string (re-pattern (str "^" prefix)) ""))
+
 (defrecord RedisStore [prefix client]
   IStore
 
   (fetch
-    [this id cb]
-    (.get client (str prefix ":" id) cb))
+    [this id]
+    (if (wildcard? id)
+      (go
+        (let [result (atom {})
+              root   (normalize-key prefix id)]
+          (doseq [k (<! (client :keys (normalize-key prefix id)))]
+            (swap! result conj [(keyword (de-prefix root k)) (<! (client :get k))]))
+          @result))
+      (client :get (normalize-key prefix id))))
 
   (write
-    [this id item cb]
-    (.set client (str prefix ":" id) item cb))
+    [this id item]
+    (client :set (normalize-key prefix id) item))
 
   (delete
-    [this id cb]
-    (.del client (str prefix ":" id) cb))
+    [this id]
+    (client :del (normalize-key prefix id)))
 
   (collection-fetch
-    [this id cb]
-    (.smembers client (str prefix ":" id) cb))
+    [this id]
+    (client :smembers (normalize-key prefix id)))
 
   (collection-add
-    [this id item cb]
-    (.sadd client (str prefix ":" id) item cb))
+    [this id item]
+    (client :sadd (normalize-key prefix id) item))
 
   (collection-remove
-    [this id item cb]
-    (.srem client (str prefix ":" id) item cb))
+    [this id item]
+    (client :srem (normalize-key prefix id) item))
 
   (destroy
     [this]
-    (.quit client)))
+    (client :quit)))
 
 (defn store
   ([] (store "hunger"))
-  ([prefix] (RedisStore. prefix (.createClient redis))))
+  ([prefix] (RedisStore. prefix (redis-connect))))
 
