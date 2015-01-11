@@ -1,7 +1,7 @@
 (ns test.hunger.redis-store
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [deftest testing is]]
-            [a :refer [unordered-equal]]
+            [test.helpers :refer [unordered-equal]]
             [cljs.core.async :refer [<!]]
             [hunger.store :refer [fetch write destroy collection-add collection-fetch delete]]
             [hunger.redis-store :as r]))

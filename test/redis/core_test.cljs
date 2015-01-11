@@ -1,7 +1,7 @@
 (ns test.redis.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [deftest testing is]]
-            [a :refer [unordered-equal]]
+            [test.helpers :refer [unordered-equal]]
             [cljs.core.async :refer [<!]]
             [redis.core :as r]))
 
