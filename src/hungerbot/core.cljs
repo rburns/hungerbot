@@ -31,7 +31,7 @@
                (list-feeds @store #(%) (fn [error, result]
                                          (if (= nil error)
                                            (if (= 0 (count result))
-                                             (.send (:channel message) "Got no feeds, sorry")
+                                             (.send (:channel message) "Got no feeds, sorry.")
                                              (.send (:channel message) (join "\n" result)))
                                            (.send (:channel message) "Not sure what to say.")))))})
 
