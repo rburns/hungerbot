@@ -58,6 +58,10 @@
           (reduce + (map #(last %) @result))))
       (client :del (normalize-key prefix id))))
 
+  (collection-contains?
+    [this id item]
+    (go (<! (< 0 (client :sismember (normalize-key prefix id) item)))))
+
   (collection-fetch
     [this id]
     (client :smembers (normalize-key prefix id)))

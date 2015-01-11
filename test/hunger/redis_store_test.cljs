@@ -3,7 +3,8 @@
   (:require [cljs.test :refer-macros [deftest testing is]]
             [helpers :refer [unordered-equal]]
             [cljs.core.async :refer [<!]]
-            [hunger.store :refer [fetch write destroy collection-add collection-fetch delete]]
+            [hunger.store :refer [fetch write destroy collection-add collection-fetch delete
+                                  collection-contains?]]
             [hunger.redis-store :as r]))
 
 (deftest normalize-key
@@ -13,6 +14,15 @@
          "prefix:foo"))
   (is (= (r/normalize-key "prefix" ["foo" "bar"])
          "prefix:foo:bar")))
+
+(deftest collection-contains?-test
+  (let [store (r/store "redis-store-test-e")]
+    (go
+      (is (= 1 (<! (collection-add store "key" "value1"))))
+      (is (= true (<! (collection-contains? store "key" "value1"))))
+      (is (= false (<! (collection-contains? store "key" "value2"))))
+      (<! (delete store "key"))
+      (destroy store))))
 
 (deftest write-fetch
   (let [store (r/store "redis-store-test")]
