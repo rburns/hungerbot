@@ -1,7 +1,7 @@
 (ns test.core
   (:require [cljs.nodejs :as nodejs]
             [cljs.test :refer-macros [run-tests]]
-            [test.helpers]
+            [a]
             [test.carcass.core]
             [test.redis.core]
             [test.hunger.redis-store]
@@ -9,7 +9,7 @@
 
 (nodejs/enable-util-print!)
 
-(run-tests 'test.helpers)
+(run-tests 'a)
 (run-tests 'test.carcass.core)
 (run-tests 'test.redis.core)
 (run-tests 'test.hunger.redis-store)
