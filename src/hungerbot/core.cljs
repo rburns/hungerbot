@@ -33,13 +33,13 @@
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
                (let [sieve   (fn [feed] (= (.-name (:channel message)) (:channel (:info feed))))
-                     handler (fn [error, result]
-                               (if (= nil error)
-                                 (if (= 0 (count result))
-                                   (.send (:channel message) "Got no feeds, sorry.")
-                                   (.send (:channel message) (join "\n" (map Feed->desc result))))
-                                 (.send (:channel message) "Not sure what to say.")))]
-                 (list-feeds @store sieve handler)))})
+                     done (fn [error, result]
+                            (if (= nil error)
+                              (if (= 0 (count result))
+                                (.send (:channel message) "Got no feeds, sorry.")
+                                (.send (:channel message) (join "\n" (map Feed->desc result))))
+                              (.send (:channel message) "Not sure what to say.")))]
+                 (list-feeds @store sieve done)))})
 
 (def remove-cmd
   {:description "Removes a feed from the current channel."
