@@ -23,3 +23,9 @@
       (is (= 1 (<! (client :del "one:three"))))
       (client :quit))))
 
+(deftest nil-result
+  (let [client (r/redis-connect)]
+    (go
+      (client :del "myuniquekey")
+      (<! (client :get "myuniquekey"))
+      (client :quit))))

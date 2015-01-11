@@ -10,7 +10,8 @@
   ([output transform]
    (fn [error response]
      (if (= nil error)
-       (put! output (transform (js->clj response :keywordize-keys true)))
+       (when (not (= nil response))
+         (put! output (transform (js->clj response :keywordize-keys true))))
        (put! output (js->clj error :keywordize-keys true)))
      (close! output))))
 
