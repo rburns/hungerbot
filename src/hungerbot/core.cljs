@@ -22,7 +22,7 @@
    :handler (fn [message slack]
               (let [channel (:channel message)]
                 (if-let [url (token->url (-> message :params first))]
-                  (let [feed (Feed. url {:channel (:name channel)})]
+                  (let [feed (Feed. url {:channel (.-name channel)})]
                     (add-feed @store feed (fn [error, result]
                                             (if (= nil error)
                                               (.send channel "Duly noted, sir.")
@@ -32,7 +32,7 @@
 (def list-cmd
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
-               (let [sieve   (fn [feed] (= (:name (:channel message)) (:channel (:info feed))))
+               (let [sieve   (fn [feed] (= (.-name (:channel message)) (:channel (:info feed))))
                      handler (fn [error, result]
                                (if (= nil error)
                                  (if (= 0 (count result))
