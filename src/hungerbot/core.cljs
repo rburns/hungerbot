@@ -28,12 +28,14 @@
 (def list-cmd
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
-               (list-feeds @store #(%) (fn [error, result]
-                                         (if (= nil error)
-                                           (if (= 0 (count result))
-                                             (.send (:channel message) "Got no feeds, sorry.")
-                                             (.send (:channel message) (join "\n" result)))
-                                           (.send (:channel message) "Not sure what to say.")))))})
+               (let [sieve   (fn [] (= (:name (:channel message)) (:channel (:info %))))
+                     handler (fn [error, result]
+                               (if (= nil error)
+                                 (if (= 0 (count result))
+                                   (.send (:channel message) "Got no feeds, sorry.")
+                                   (.send (:channel message) (join "\n" result)))
+                                 (.send (:channel message) "Not sure what to say.")))]
+                 (list-feeds @store sieve handler)))})
 
 (def remove-cmd
   {:description "Removes a feed from the current channel."
