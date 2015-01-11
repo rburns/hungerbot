@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
             [cljs.core.async :refer [<!]]
-            [hunger.store :refer [fetch write collection-fetch collection-add collection-remove]]))
+            [hunger.store :refer [fetch write delete collection-fetch collection-add
+                                  collection-remove]]))
 
 (defrecord Feed [url info])
 
@@ -20,7 +21,9 @@
 
 (defn remove-feed
   [store feed cb]
-  (collection-remove store "feeds" feed))
+  (go (<! (collection-remove store "feeds" (:url feed)))
+      (<! (delete store ["feed" (:url feed) "*"]))
+      (cb nil "OK")))
 
 (defn list-feeds
   [store sieve cb]
