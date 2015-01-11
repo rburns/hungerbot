@@ -2,7 +2,7 @@
   (:require [cljs.nodejs :as nodejs]
             [clojure.string :refer [join]]
             [carcass.core :as carcass :refer [token->url]]
-            [hunger.core :refer [Feed list-feeds add-feed remove-feed]]
+            [hunger.core :refer [Feed list-feeds fetch-feed add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :as redis-store]))
 
@@ -45,7 +45,15 @@
   {:description "Removes a feed from the current channel."
    :params [:url]
    :handler (fn [message slack]
-              (.send (:channel message) "I'll be able to remove feed subscriptions shortly!"))})
+              (let [feed  (Feed. (token->url (-> message :params first)) {})
+                    sieve (fn [feed] (= (.-name (:channel message)) (:channel (:info feed))))
+                    done  (fn [error result]
+                            (.send (:channel message) "Scrubbed clean."))
+                    scrub (fn [error result]
+                            (if (= nil result)
+                              (.send (:channel message) "Uh, can't find that one.")
+                              (remove-feed @store result done)))]
+                (fetch-feed @store feed sieve scrub)))})
 
 (defn default-response
   [message slack]
