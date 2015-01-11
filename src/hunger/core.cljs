@@ -7,8 +7,8 @@
 (defrecord Feed [url info])
 
 (defn url->feed
-  [url store]
-  (Feed. url {}))
+  [store url]
+  (go (Feed. url (<! (fetch store ["feed" url "*"])))))
 
 (defn add-feed
   [store feed cb]
@@ -26,7 +26,8 @@
   [store filter cb]
   (let [results (atom [])]
     (go
-      (swap! results conj (map #(url->feed % store) (<! (collection-fetch store "feeds"))))
+      (doseq [url (<! (collection-fetch store "feeds"))]
+        (swap! results conj (<! (url->feed store url))))
       (cb nil @results))))
 
 (defn last-item-in-feed

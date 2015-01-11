@@ -15,8 +15,7 @@
       (client :set "p:feed:foo:bar" "val4")
       (client :set "p:feed:foo:baz" "val5")
       (client :set "p:feed:foo:zot" "val6")
-      (is (= (h/url->feed "foo" store)
-             (h/Feed. "foo" {:bar "val4" :baz "val5" :zot "val6"})))
+      (is (= (<! (h/url->feed store "foo")) (h/Feed. "foo" {:bar "val4" :baz "val5" :zot "val6"})))
       (client :quit)
       (destroy store))))
 
