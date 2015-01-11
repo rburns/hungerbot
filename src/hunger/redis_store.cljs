@@ -49,7 +49,14 @@
 
   (delete
     [this id]
-    (client :del (normalize-key prefix id)))
+    (if (wildcard? id)
+      (go
+        (let [result (atom [])
+              root   (normalize-key prefix id)]
+          (doseq [k (<! (client :keys (normalize-key prefix id)))]
+            (swap! result conj [(keyword (de-prefix root k)) (<! (client :del k))]))
+          (reduce + (map #(last %) @result))))
+      (client :del (normalize-key prefix id))))
 
   (collection-fetch
     [this id]

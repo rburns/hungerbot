@@ -40,6 +40,15 @@
       (is (= 1 (<! (delete store ["foo" "baz"]))))
       (destroy store))))
 
+(deftest wildcard-delete
+  (let [store (r/store "redis-store-test-b")]
+    (go
+      (write store ["foo" "bar"] "val1")
+      (write store ["foo" "baz"] "val2")
+      (is (= 2 (<! (delete store ["foo" "*"]))))
+      (is (= {} (<! (fetch store ["foo" "*"]))))
+      (destroy store))))
+
 (deftest collection-add-fetch-remove
   (let [store (r/store "redis-store-test")]
     (go
