@@ -1,24 +1,43 @@
 (ns hunger.core
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
-            [hunger.store :refer [fetch write collection-fetch collection-add collection-remove]]))
+            [cljs.core.async :refer [<!]]
+            [hunger.store :refer [fetch write delete collection-fetch collection-add
+                                  collection-remove]]))
+
+(defrecord Feed [url info])
+
+(defn url->feed
+  [store url]
+  (go (Feed. url (<! (fetch store ["feed" url "*"])))))
 
 (defn add-feed
-  [url store cb]
-  (collection-add store "feeds" url cb))
+  [store feed cb]
+  (let [results (atom  [])]
+    (go (swap! results conj (<! (collection-add store "feeds" (:url feed))))
+        (doseq [[prop value] (seq (:info feed))]
+          (swap! results conj (<! (write store ["feed" (:url feed) (name prop)] value))))
+        (cb nil feed))))
 
 (defn remove-feed
-  [url store cb]
-  (collection-remove store "feeds" url cb))
+  [store feed cb]
+  (go (<! (collection-remove store "feeds" (:url feed)))
+      (<! (delete store ["feed" (:url feed) "*"]))
+      (cb nil "OK")))
 
 (defn list-feeds
-  [store cb]
-  (collection-fetch store "feeds" cb))
+  [store sieve cb]
+  (let [results (atom [])]
+    (go
+      (doseq [url (<! (collection-fetch store "feeds"))]
+        (swap! results conj (<! (url->feed store url))))
+      (cb nil (filter sieve @results)))))
 
 (defn last-item-in-feed
-  [url store cb]
-  (fetch store (str "last-item-of-" url) cb))
+  [store feed cb]
+  (fetch store (str "last-item-of-" feed)))
 
 (defn update-last-item-in-feed
-  [url item store cb]
-  (write store (str "last-item-of-" url) item cb))
+  [store feed item cb]
+  (write store (str "last-item-of-" feed) item))
 
