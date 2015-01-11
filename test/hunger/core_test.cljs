@@ -35,6 +35,26 @@
                      (h/list-feeds store (fn [] true) finish))]
     (h/add-feed store feed list-feeds)))
 
+(deftest fetch-feed-that-exists
+  (let [store      (r/store "redis-hunger-test-d")
+        feed       (h/Feed. "http://foo" {:bar "baz"})
+        finish     (fn [error result]
+                     (is (= feed result))
+                     (h/remove-feed store feed #(destroy store)))
+        fetch-feed (fn [error result] (h/fetch-feed store feed #(= "baz" (:bar (:info %))) finish))
+        add-feed   (fn [] (h/add-feed store feed fetch-feed))]
+    (add-feed)))
+
+(deftest fetch-feed-that-does-not-exist
+  (let [store      (r/store "redis-hunger-test-d")
+        feed       (h/Feed. "http://foo" {:bar "baz"})
+        finish     (fn [error result]
+                     (is (= nil result))
+                     (h/remove-feed store feed #(destroy store)))
+        fetch-feed (fn [error result] (h/fetch-feed store feed #(= "zot" (:bar (:info %))) finish))
+        add-feed   (fn [] (h/add-feed store feed fetch-feed))]
+    (add-feed)))
+
 (deftest remove-feed
   (let [store      (r/store "redis-hunger-test-c")
         feed       (h/Feed. "http://foo" {:bar "baz"})

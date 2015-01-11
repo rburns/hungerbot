@@ -60,7 +60,7 @@
 
   (collection-contains?
     [this id item]
-    (go (<! (< 0 (client :sismember (normalize-key prefix id) item)))))
+    (go (< 0 (<! (client :sismember (normalize-key prefix id) item)))))
 
   (collection-fetch
     [this id]
