@@ -29,9 +29,11 @@
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
                (list-feeds @store #(%) (fn [error, result]
-                                   (if (= nil error)
-                                    (.send (:channel message) (join "\n" result))
-                                    (.send (:channel message) "Not sure what to say.")))))})
+                                         (if (= nil error)
+                                           (if (= 0 (count result))
+                                             (.send (:channel message) "Got no feeds, sorry")
+                                             (.send (:channel message) (join "\n" result)))
+                                           (.send (:channel message) "Not sure what to say.")))))})
 
 (def remove-cmd
   {:description "Removes a feed from the current channel."
