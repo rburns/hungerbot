@@ -23,12 +23,12 @@
   (collection-remove store "feeds" feed))
 
 (defn list-feeds
-  [store filter cb]
+  [store sieve cb]
   (let [results (atom [])]
     (go
       (doseq [url (<! (collection-fetch store "feeds"))]
         (swap! results conj (<! (url->feed store url))))
-      (cb nil @results))))
+      (cb nil (filter sieve @results)))))
 
 (defn last-item-in-feed
   [store feed cb]

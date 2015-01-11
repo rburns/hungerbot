@@ -29,6 +29,18 @@
                      (destroy store))
         list-feeds (fn [error result]
                      (is (= result feed))
-                     (h/list-feeds store #(%) finish))]
+                     (h/list-feeds store (fn [] true) finish))]
     (h/add-feed store feed list-feeds)))
+
+(deftest filtered-feed-list
+  (let [store      (r/store "redis-hunger-test-a")
+        feed-one   (h/Feed. "http://a" {:detail "zot"})
+        feed-two   (h/Feed. "http://b" {:detail "bar"})
+        finish     (fn [error result]
+                     (is (= [feed-one] result))
+                     (destroy store))
+        list-feeds (fn [] (h/list-feeds store #(= "zot" (:detail (:info %))) finish))
+        add-second (fn [] (h/add-feed store feed-one list-feeds))
+        add-first  (fn [] (h/add-feed store feed-two add-second))]
+    (add-first)))
 
