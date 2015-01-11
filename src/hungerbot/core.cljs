@@ -2,7 +2,7 @@
   (:require [cljs.nodejs :as nodejs]
             [clojure.string :refer [join]]
             [carcass.core :as carcass :refer [token->url]]
-            [hunger.core :refer [list-feeds add-feed remove-feed]]
+            [hunger.core :refer [Feed list-feeds add-feed remove-feed]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :as redis-store]))
 
@@ -18,16 +18,17 @@
    :handler (fn [message slack]
               (let [channel (:channel message)]
                 (if-let [url (token->url (-> message :params first))]
-                  (add-feed url @store (fn [error, result]
-                                         (if (= nil error)
-                                           (.send channel "Duly noted, sir.")
-                                           (.send channel "Something went wrong."))))
+                  (let [feed (Feed. url {:channel (:name channel)})]
+                    (add-feed @store feed (fn [error, result]
+                                            (if (= nil error)
+                                              (.send channel "Duly noted, sir.")
+                                              (.send channel "Something went wrong.")))))
                   (.send channel "Hardly seems you should be looking at that."))))})
 
 (def list-cmd
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
-               (list-feeds @store (fn [error, result]
+               (list-feeds @store #(%) (fn [error, result]
                                    (if (= nil error)
                                     (.send (:channel message) (join "\n" result))
                                     (.send (:channel message) "Not sure what to say.")))))})
