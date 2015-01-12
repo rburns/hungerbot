@@ -1,4 +1,4 @@
-(ns test.hunger.core
+(ns hunger.core-test
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.test :refer-macros [deftest testing is]]
             [cljs.core.async :refer [<!]]

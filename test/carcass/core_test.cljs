@@ -1,4 +1,4 @@
-(ns test.carcass.core
+(ns carcass.core-test
   (:require [cljs.test :refer-macros [deftest testing is]]
             [carcass.core :as c]))
 

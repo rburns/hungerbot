@@ -1,4 +1,4 @@
-(ns helpers
+(ns test-helpers
   (:require [cljs.test :refer-macros [deftest is]]))
 
 (defn unordered-equal

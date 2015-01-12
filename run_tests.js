@@ -4,4 +4,4 @@ try {
 }
 require("./test_out/goog/bootstrap/nodejs.js");
 require("./test_out/test.js");
-goog.require("test.core");
+goog.require("test_runner");
