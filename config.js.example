@@ -1,11 +1,16 @@
 exports.config = {
+	"slack": {
+		// The token probided by the slack bot integration
+		"token":          "xxxx-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
 
-	// The token probided by the slack bot integration
-	"token":          "xxxx-xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+		// Automatically reconnect upon disconnect
+		"auto-reconnect": true,
 
-	// Automatically reconnect upon disconnect
-	"auto-reconnect": true,
-
-	// Automatically mark last read message in channel
-	"auto-mark":      true
+		// Automatically mark last read message in channel
+		"auto-mark":      true
+	},
+	"hunger": {
+		// the default interval at which feeds are checked (in minutes)
+		"default-interval": 30
+	}
 };

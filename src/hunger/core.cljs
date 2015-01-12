@@ -42,6 +42,11 @@
         (swap! results conj (<! (url->feed store url))))
       (cb nil (filter sieve @results)))))
 
+(defn poll-for-feeds
+  [default-interval new-items-handler]
+
+  )
+
 (defn last-item-in-feed
   [store feed cb]
   (fetch store (str "last-item-of-" feed)))
