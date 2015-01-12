@@ -32,7 +32,7 @@
   [store]
   {:description "List the feeds in the current channel."
    :handler  (fn [message slack]
-               (let [sieve   (fn [feed] (= (.-name (:channel message)) (:channel (:info feed))))
+               (let [sieve   (fn [feed] (= (-> message :channel .-name) (-> feed :info :channel)))
                      done (fn [error, result]
                             (if (= nil error)
                               (if (= 0 (count result))
@@ -47,7 +47,7 @@
    :params [:url]
    :handler (fn [message slack]
               (let [feed  (Feed. (token->url (-> message :params first)) {})
-                    sieve (fn [feed] (= (.-name (:channel message)) (:channel (:info feed))))
+                    sieve (fn [feed] (= (-> message :channel .-name) (-> feed :info :channel)))
                     done  (fn [error result]
                             (.send (:channel message) "Scrubbed clean."))
                     scrub (fn [error result]
