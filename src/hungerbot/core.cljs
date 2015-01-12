@@ -61,7 +61,7 @@
 
 (defn -main []
   (reset! store (redis-store/store))
-  (carcass/animate {:description "I'll give you the feeds"
+  (carcass/animate {:description "I'll give you the feeds."
                     :config config
                     :commands {:subscribe subscribe-cmd
                                :list list-cmd
