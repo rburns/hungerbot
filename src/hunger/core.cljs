@@ -36,11 +36,13 @@
 
 (defn list-feeds
   [store sieve cb]
-  (let [results (atom [])]
-    (go
-      (doseq [url (<! (collection-fetch store "feeds"))]
-        (swap! results conj (<! (url->feed store url))))
-      (cb nil (filter sieve @results)))))
+  (go
+    (cb nil (filter sieve (loop [urls  (<! (collection-fetch store "feeds"))
+                                 feeds []]
+                            (if (empty? urls)
+                              feeds
+                              (recur (rest urls)
+                                     (conj feeds (<! (url->feed store (first urls)))))))))))
 
 (defn last-item-in-feed
   [store feed cb]
