@@ -1,7 +1,7 @@
 (ns hunger.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
-            [cljs.core.async :refer [<!]]
+            [cljs.core.async :refer [<! chan pipe]]
             [hunger.store :refer [fetch write delete collection-fetch collection-add
                                   collection-contains? collection-remove]]))
 
@@ -9,6 +9,7 @@
 
 (defn url->feed
   [store url]
+  (println (str "url: " url))
   (go (Feed. url (<! (fetch store ["feed" url "*"])))))
 
 (defn add-feed
@@ -36,13 +37,12 @@
 
 (defn list-feeds
   [store sieve cb]
-  (go
-    (cb nil (filter sieve (loop [urls  (<! (collection-fetch store "feeds"))
-                                 feeds []]
-                            (if (empty? urls)
-                              feeds
-                              (recur (rest urls)
-                                     (conj feeds (<! (url->feed store (first urls)))))))))))
+  (let [feeds-ch  (chan 1 (comp (filter sieve) (map (partial url->feed store))))]
+    (pipe (collection-fetch store "feeds") feeds-ch)
+    (go (cb nil (loop [feed  (<! feeds-ch)
+                       feeds []]
+                  (if (nil? feed) feeds (recur (<! feeds-ch)
+                                               (conj feeds feed))))))))
 
 (defn last-item-in-feed
   [store feed cb]
