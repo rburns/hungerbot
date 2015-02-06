@@ -2,7 +2,7 @@
   (:require [cljs.nodejs :as nodejs]
             [clojure.string :refer [join]]
             [carcass.core :as carcass :refer [token->url]]
-            [hunger.core :refer [Feed list-feeds fetch-feed add-feed remove-feed poll-for-feeds]]
+            [hunger.core :refer [Feed list-feeds fetch-feed add-feed remove-feed consume-feeds]]
             [hunger.store :refer [destroy]]
             [hunger.redis-store :as redis-store]))
 
@@ -62,7 +62,8 @@
 
 (defn post-items-to-channel
   [slack]
-  (fn [items]))
+  (fn [items]
+    (println (str "got new items" items))))
 
 (defn -main []
   (let [store (redis-store/store)
@@ -72,6 +73,6 @@
                                            :list (list-cmd store)
                                            :remove (remove-cmd store)}
                                 :default-response default-response})]
-    (poll-for-feeds (-> config :hunger :default-interval) (post-items-to-channel slack))))
+    (consume-feeds store (-> config :hunger :default-interval) (post-items-to-channel slack))))
 
 (set! *main-cli-fn* -main)

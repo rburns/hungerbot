@@ -2,6 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.nodejs :as nodejs]
             [cljs.core.async :refer [<!]]
+            [hunger.consume :refer [consume]]
             [hunger.store :refer [fetch write delete collection-fetch collection-add
                                   collection-contains? collection-remove]]))
 
@@ -42,10 +43,14 @@
         (swap! results conj (<! (url->feed store url))))
       (cb nil (filter sieve @results)))))
 
-(defn poll-for-feeds
-  [default-interval new-items-handler]
-
-  )
+(defn consume-feeds
+  [store default-interval new-items-handler]
+  (let [context {:store             store
+                 :default-interval  default-interval
+                 :new-items-handler new-items-handler
+                 :intervals         (atom {})}]
+    (list-feeds store (fn [] true) (consume context))
+    context))
 
 (defn last-item-in-feed
   [store feed cb]
